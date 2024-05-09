@@ -1,4 +1,4 @@
-theme: just-the-docs
+remote-theme: sighingnow/jekyll-gitbook
 title: ASR for sociolinguists
 baseurl: "/asr"
 
