@@ -75,7 +75,7 @@ There are two main ways to run Whisper (or any of its children):
 
 
 
-##Other options
+## Other options
 Some additional tools I've seen mentioned, but which I haven't tested extensively myself:
 - [vosk](https://github.com/alphacep/vosk-api) speech recognition toolkit, which you can download and run locally offline
   + [vosk](https://github.com/alphacep/vosk-api) is the backend for [audapolis](https://github.com/bugbakery/audapolis), a GUI which allows you to use download and run vosk ASR models, and then correct the output.
@@ -104,7 +104,187 @@ ASR is not a solution to all of the world's transcription problems. There are a 
 # WhisperX tutorial 
 
 ## Local installation
+For this section, I'll give guidance for installing on Windows 10. If you are working on a University computer or your institution has access to a high-perfomance computer cluster, your IT department should help you set this up.
 
-### Step one: Install python and conda
+Please note that the instructions below are just what I personally did, and what worked for me and my machine.
 
-*More coming soon...*
+### Step One: Install conda
+conda is a package and environment management system that is useful for installing and running WhisperX. It allows you to download nearly all of the dependencies (= other packages you need to install for WhisperX to run) at the same time as installing WhisperX. You can choose whether you want to install the full version of Anaconda or just Miniconda, a smaller version of it, but for this I'd recommend Miniconda, because it does what we need and it takes up less space on your computer. You can get it [here](https://docs.anaconda.com/miniconda/miniconda-install/).
+
+If you aren't able to install it on your institution's managed computers, get support from them - You might need to ask for special administrative rights.
+
+### Step Two: Set up a conda environment and install dependencies
+One of the reasons conda is useful is because you might have different pieces of software on your computer that need different versions of different dependencies - conda lets you give each of these a separate spot on your computer, called an environment, where these different versions can live without getting in each other's way. We're going to set one of these up for WhisperX. 
+
+Assuming you installed Miniconda above, you should now be able to use it's own command prompt. Look for something called Anaconda Prompt (miniconda3) and run it. A black window should pop up. Run the following code to create an environment to install WhisperX in:
+
+```
+conda create --name whisperx python=3.10
+```
+
+This essentially says, `Conda, please create a virtual environment for me, name it whisperx, and install Python v3.10 inside it'. You might already have Python installed somewhere else on your computer, but what's useful about this is that we can install v3.10 just in this part of you computer, without upsetting anything else you're doing with a different version of Python. Other versions of Python might work just fine, but v3.10 is just what the developer has tested it on. You can call it something else if you like by changing 'whisperx' to whatever you'd like to call it.
+
+If you are using a device managed by your University, you might additionally have to specify where you'd like this virtual environment to be created. My laptop really wanted to put it in my roaming user profile, which caused problems later down the line. If this is the case, you should alternatively run something like this to specify where you'd like to create the environment. 
+
+```
+conda create --prefix C:\Users\youruser\.conda\envs\whisperx python=3.10
+```
+You'll get a little prompt showing you what packages it will install, and asking if you want to proceed. Type 'y' and press enter to agree.
+
+You can then activate this environment by running this:
+
+```
+conda activate whisperx
+``` 
+
+You can tell whether you are 'in' your WhisperX environment or not as it will display the name of your environment in brackets before the directory. So it will look something like this
+
+  Now that the environment has been activated, anything you install will just install here. So we can go ahead an install the dependencies like this:
+
+```
+conda install pytorch==2.0.0 torchaudio==2.0.0 pytorch-cuda=11.8 -c pytorch -c nvidia
+```
+
+Wait a bit, grab some coffee. These are machine learning packages, one of which (torchaudio) is specifically for working with audio files and doing signal processing.
+
+
+I also installed [ffmpeg](https://www.ffmpeg.org/) using [scoop](https://scoop.sh/), following [the instructions given on the Whisper installation page](https://github.com/openai/whisper). I've since learned you maybe can actually get this through conda, but anyway, I've never done that so I'll stick to recommending doing it via scoop. ffmpeg is actually a great tool to have installed if you're working with sound files, as it lets you convert between formats.
+
+
+```
+scoop install ffmpeg
+```
+
+
+### Step Three: Install WhisperX
+You've made it! Now you can install what you came here for:
+
+```
+pip install git+https://github.com/m-bain/whisperx.git
+```
+
+If, as described above, you've faced a similar issue where things are installing in unexpected places, you can specify the installation location like this:
+
+```
+pip install --target C:\Users\youruser\.conda\envs\whisperx git+https://github.com/m-bain/whisperx.git
+```
+
+
+## Running a test file
+Before we start fiddling with different settings, you're going to want to check it's working by running WhisperX on a short file. For the purposes of this tutorial, we'll use the file provided on the WhisperX GitHub.
+
+I'd recommend using a recording from [the Speech Accent Archive](https://accent.gmu.edu), because they're usually quite short so won't take long to run - so you won't be left for an hour wondering whether anything is actually happening. I'll just use the recording [english1.mp3](https://accent.gmu.edu/browse_language.php?function=detail&speakerid=61), which is a male speaker from Pittsburgh reading 'Please call Stella'. 
+
+Because it's a test file, we'll run it using the CPU - i.e. using your computer's normal processor. We'll also use the tiny model, which uses the least amount of processing power, and tell it to expect to find English. This should mean it's possible to run this code on most computers. It might not give the best output, but for now, we just want to see if it's working. 
+
+
+In the Anaconda Prompt window with your whisperx environment activated, navigate to wherever your file is stored by using the 'cd' command to change directory, like this:
+
+```
+cd C:\Users\Joe\my_whisperx_files\
+```
+
+You'll now be in the folder where you stored your test file. Run it through WhisperX on the most basic settings like this:
+
+```
+whisperx english1.mp3 --language en --model tiny --compute_type int8
+```
+
+This says: run WhisperX on this file, expect English, use the tiny model, and use the CPU resources instead of looking for a GPU. 
+You'll see this running, and you might see it downloading the model along the way. It will give you a few warnings about the torchaudio backend being deprecated, which you can ignore. 
+
+Pretty quickly, some new files will appear with your transcript. These are:
+
+- A .txt file, containing *only* the text of your transcript in plain text.
+- .tsv, .srt, and .vtt formats, which are common subtitle formats. These should contain timestamps.
+- A .json file, which contains the start and end time of each chunk transcribed, followed by the transcript of the chunk, and then within that:
+  + The start time and end time of each word in the chunk
+  + The confidence score. To be honest, I'm unclear on whether this is the confidence on the accuracy of the word, the timestamps, or some combination of these. 
+
+### Specifying an output directory
+
+By default, the output will appear in whatever you working directory is - wherever you navigated to above when you changed directory. This can be a bit impractical, but luckily WhisperX lets you specify the output with the handy 'output_dir' command. 
+
+
+```
+whisperx english1.mp3 --language en --model tiny --compute_type int8 --output_dir path\to\your_folder
+```
+
+## Running WhisperX on GPU
+If you want to run WhisperX on longer files, use larger models, implement speaker diarization, or run a large number of files, you might want to consider running it on a GPU instead. 
+
+If you don't know whether your computer has a GPU, you can check by [following these instructions](https://www.laptopmag.com/articles/check-vram-windows-10). The 'dedicated video memory' that you find by following that guide is the amount of VRAM you have. [The OpenAI Whisper GitHub](https://github.com/openai/whisper) has a breakdown of how much VRAM you need to run different size models. You might have an graphics card that means that you have enough VRAM to use the GPU on your computer, but I did not, so can't give any guidance on setting that up. My own laptop has 128MB, which is much less that the 1GB they recommend for running the tiny model! 
+
+Because of this, I set it up on the University of York's Viking cluster. If you know that you need to run WhisperX on a lot of data and are based at a university, it's worth looking into whether there are any options for this. If they have something similar, it is likely to run on Linux, and you might have to go through slightly different steps to set it up. At York, I followed the following steps:
+
+1. Got in touch with IT to set up an account.
+2. Connect to the University VPN.
+3. Set up WinSCP to transfer files to Viking.
+3. ssh onto Viking.
+4. Load miniconda.
+5. Create and activate a WhisperX virtual environment.
+6. Install dependencies.
+7. Install WhisperX.
+8. Use jobscripts to submit WhisperX jobs. 
+
+A lot of this is quite similar to setting it up on Windows, but with some different syntax and a few extra steps. My impression is that similar systems at different universities are unlikely to work in the exact same way, so I won't go into details here - instead, get support from your IT team.
+
+Once you have it set up, it's just the same to run it, except you don't have to tell it to use the GPU, because this is the default setting. For example, you could run: 
+
+```
+whisperx english1.mp3 --language en --model tiny
+```
+
+This would run the same as our example above on CPU, but on the GPU. In what follows, I'll assume that you know whether you're using CPU or GPU, and know what steps to follow.
+
+## Running WhisperX on multiple files
+If you know the names of all your files, you can do this by simply listing the names of all your files in the command, e.g.:
+
+```
+whisperx my_folder/english1.mp3 my_folder/english2.mp3 --language en --model tiny --compute_type int8
+```
+
+Sometimes, though, it might be more useful to put all of files into a particular folder and tell it to run on all the files in that folder. You can do this using a FOR loop, and then it will iterate through each file in your directory. 
+
+```
+FOR %i IN (my_folder\*.mp3) DO whisperx --language en --model tiny --compute_type int8 --output_dir my_folder %i
+```
+
+You can tell it to look for all files with a specific extension - here I've told it to look for .mp3 files, but you could do the same for .wav, or any file type that WhisperX supports. It will then find each .mp3 in 'my_folder' and run the command on each file in turn. 
+
+## What else can WhisperX do?
+
+WhisperX comes with a whole host of different fun options. To see what they all are, run this:
+
+```
+whisperx --help
+```
+
+This will list out all the options available. For now though, we'll focus on of its more interesting/useful capabilities.
+
+
+## Diarization
+
+*To come...*
+
+## Converting WhisperX output to other formats
+
+*To come...*
+
+## Prompting
+
+*In progress...*
+
+## Using a larger alignment model
+
+*Still under construction...*
+
+### Troubleshooting
+
+If you're having trouble with WhisperX, try playing around with these settings.
+
+**--batchsize** Reducing this will reduce the GPU memory required. The default is 8, but try, e.g. '--batch_size 4' if you have a small GPU and see if it helps.
+**--vad_onset** This is a Voice Activity Detection Setting. The default is 0.5. If you find speech isn't being detected, try reducing it. To be honest, I haven't found this helpful.
+**--vad_offset** This is a Voice Activity Detection Setting. The default is 0.363. If you find speech isn't being detected, try reducing it. To be honest, I haven't found this helpful.
+**--suppress_tokens** This setting lets you suppress special characters. Its default setting will suppress most special characters except punctuation, but if you're having trouble with it inserting special characters into your transcription, you can add these here in a comma-separated list. 
+**--no_speech_threshold** Another one to experiment with if speech isn't being detected. The default is 0.6 - increasing it, should, theoretically, cause it to find more speech in quiet sections and background noise. The tradeoff is that it may hallucinate more.
