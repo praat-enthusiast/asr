@@ -1,7 +1,65 @@
-remote-theme: sighingnow/jekyll-gitbook
-title: ASR for sociolinguists
-baseurl: "/asr"
+title:            ASR for sociolinguists
+author:           Joe Pearce
+description: >
+  A tutorial for using ASR to aid you in sociolinguistic and phonetic research.
+
+version:          1.0
+gitbook_version:  3.2.3
+
+url:              '"https://praat-enthusiast.github.io/"'
+baseurl:          '/asr'
+rss:              RSS
+
+# bootstrap: use the remote theme for the site itself
+remote_theme: sighingnow/jekyll-gitbook
+
 toc:
-    enabled: true
-    h_min: 1
-    h_max: 3
+  enabled: true
+  h_min:   1
+  h_max:   3
+
+# markdown render engine.
+markdown:         kramdown
+kramdown:
+  auto_ids:               true
+  input:                  GFM
+  math_engine:            mathjax
+  smart_quotes:           lsquo,rsquo,ldquo,rdquo
+  toc_levels:             1..6
+  syntax_highlighter:     rouge
+  syntax_highlighter_opts:
+    guess_lang:           true
+
+syntax_highlighter_style: colorful
+
+markdown_ext:             markdown,mkdown,mkdn,mkd,md
+
+# Permalinks
+permalink:                /:categories/:year-:month-:day-:title:output_ext
+
+exclude:
+  - _drafts
+
+collections:
+  pages:
+    output: true
+    permalink: /:collection/:path/
+  others:
+    output: true
+    permalink: /:collection/:path/
+
+ordered_collections:
+  - posts
+  - pages
+  - others
+
+page_width: 800px
+
+destination:      ./_site
+incremental:      false
+regenerate:       true
+
+plugins:
+  - jekyll-feed
+  - jekyll-readme-index
+  - jemoji
