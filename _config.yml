@@ -8,17 +8,9 @@ gitbook_version:  3.2.3
 
 url:              '"https://praat-enthusiast.github.io/"'
 baseurl:          '/asr'
-rss:              RSS
-
-# bootstrap: use the remote theme for the site itself
 remote_theme: sighingnow/jekyll-gitbook
 
 toc:
   enabled: true
   h_min:   1
   h_max:   3
-
-plugins:
-  - jekyll-feed
-  - jekyll-readme-index
-  - jemoji
