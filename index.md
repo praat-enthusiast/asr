@@ -4,8 +4,6 @@ date: "2024-04-24"
 author:
   name: "Joe Pearce"
   url: "https://praat-enthusiast.github.io/"
-format:
-  html: default
 license: "CC-BY-SA 4.0"
 citation: true
 ---
