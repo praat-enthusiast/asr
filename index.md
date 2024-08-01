@@ -7,6 +7,7 @@ author:
 format:
   html: default
 license: "CC-BY-SA 4.0"
+layout: single
 citation: true
 ---
 
