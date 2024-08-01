@@ -9,7 +9,7 @@ format:
 license: "CC-BY-SA 4.0"
 citation: true
 ---
-{:toc}
+
 test 14:26
 
 # Terminology
