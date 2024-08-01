@@ -1,7 +1,6 @@
 remote-theme: sighingnow/jekyll-gitbook
 title: ASR for sociolinguists
 baseurl: "/asr"
-layout: single
 toc:
     enabled: true
     h_min: 1
