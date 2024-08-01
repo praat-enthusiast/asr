@@ -11,6 +11,7 @@ citation: true
 ---
 
 # Terminology
+-------------
 Come back to this part of the tutorial if you see terminology that doesn't make sense to you. 
 Please note, I am not an expert in any of this, but a mere sociolinguist/phonetician who has learnt about ASR in order to use it. These explanations come from my own understanding, so feel free to correct me if you disagree with my explanations.
 
